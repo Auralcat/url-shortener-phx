@@ -1,0 +1,20 @@
+<h1>Show Link</h1>
+
+<ul>
+  <li>
+    <strong>Original url:</strong>
+    <%= @link.original_url %>
+  </li>
+
+  <li>
+    <strong>Short url:</strong>
+    <%= @link.short_url %>
+  </li>
+
+  <li>
+    <strong>Hits:</strong>
+    <%= @link.hits %>
+  </li>
+</ul>
+
+<span><%= link "Back", to: Routes.link_path(@conn, :new) %></span>

@@ -17,7 +17,8 @@ defmodule UrlShortenerWeb.Router do
   scope "/", UrlShortenerWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", LinkController, :new
+    resources "/links", LinkController, only: [:create, :show]
   end
 
   # Other scopes may use custom stacks.
