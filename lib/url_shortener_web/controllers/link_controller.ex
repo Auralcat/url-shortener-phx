@@ -9,8 +9,10 @@ defmodule UrlShortenerWeb.LinkController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"link" => link_params}) do
-    case Links.create_link(link_params) do
+  def create(conn, %{"link" => incoming_params}) do
+    parsed_params = link_params(incoming_params)
+
+    case Links.create_link(parsed_params) do
       {:ok, link} ->
         conn
         |> put_flash(:info, "Link created successfully.")
@@ -25,4 +27,10 @@ defmodule UrlShortenerWeb.LinkController do
     link = Links.get_link!(id)
     render(conn, "show.html", link: link)
   end
+
+  defp link_params(%{"original_url" => original_url}) do
+    %{original_url: original_url}
+  end
+
+  defp link_params(incoming_params), do: incoming_params
 end

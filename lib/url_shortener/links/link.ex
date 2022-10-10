@@ -9,7 +9,7 @@ defmodule UrlShortener.Links.Link do
   @url_regex ~r/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/
 
   schema "links" do
-    field :hits, :integer
+    field :hits, :integer, default: 0
     field :original_url, :string
     field :short_url, :string
 

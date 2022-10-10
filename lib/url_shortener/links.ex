@@ -3,6 +3,9 @@ defmodule UrlShortener.Links do
   The Links context.
   """
 
+  @slug_length 8
+  @hashing_algorithm :sha
+
   import Ecto.Query, warn: false
   alias UrlShortener.Repo
 
@@ -37,9 +40,15 @@ defmodule UrlShortener.Links do
 
   """
   def create_link(attrs \\ %{}) do
-    %Link{}
-    |> Link.changeset(attrs)
-    |> Repo.insert()
+    original_url = attrs[:original_url]
+
+    with {:ok, short_url} <- create_slug(original_url) do
+      link_params = %{original_url: original_url, short_url: short_url}
+
+      %Link{}
+      |> Link.changeset(link_params)
+      |> Repo.insert()
+    end
   end
 
   @doc """
@@ -53,5 +62,20 @@ defmodule UrlShortener.Links do
   """
   def change_link(%Link{} = link, attrs \\ %{}) do
     Link.changeset(link, attrs)
+  end
+
+  def create_slug(original_url) do
+    processed_url = Regex.replace(~r/^https?:\/\//, original_url, "")
+    server_url = UrlShortenerWeb.Endpoint.url()
+
+    link_hash =
+      @hashing_algorithm
+      |> :crypto.hash(processed_url)
+      |> Base.encode64()
+      |> String.slice(0, @slug_length)
+
+    hashed_url = Enum.join([server_url, link_hash], "/")
+
+    {:ok, hashed_url}
   end
 end

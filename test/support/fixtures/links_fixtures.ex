@@ -10,7 +10,7 @@ defmodule UrlShortener.LinksFixtures do
   def link_fixture(attrs \\ %{}) do
     {:ok, link} =
       attrs
-      |> Enum.into(%{original_url: "https://example.com", hits: 0})
+      |> Enum.into(%{original_url: "https://example.com"})
       |> UrlShortener.Links.create_link()
 
     link
