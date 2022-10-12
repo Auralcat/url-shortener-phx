@@ -27,7 +27,7 @@ defmodule UrlShortenerWeb.LinkControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      invalid_attrs = %{original_url: "http://invalid"}
+      invalid_attrs = %{original_url: "not a URL"}
       conn = post(conn, Routes.link_path(conn, :create), link: invalid_attrs)
       assert html_response(conn, 200) =~ "Shorten your URLs"
     end

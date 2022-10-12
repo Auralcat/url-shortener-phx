@@ -22,6 +22,7 @@ defmodule UrlShortener.LinksTest do
       valid_attrs = %{original_url: valid_url}
 
       assert {:ok, %Link{} = link} = Links.create_link(valid_attrs)
+
       assert link.original_url == valid_url
       assert link.url_alias == url_alias
       assert link.hits == 0

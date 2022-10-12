@@ -1,15 +1,14 @@
-<.form let={f} for={@changeset} action={@action}>
-  <%= if @changeset.action do %>
-    <div class="alert alert-danger">
-      <p>Oops, something went wrong! Please check the errors below.</p>
+<%= form_for @changeset, Routes.link_path(@conn, :create), [name: "shorten_url_form", onsubmit: 'validateUrlFormat(document.getElementById("link_original_url"))'], fn f -> %>
+    <%= if @changeset.action do %>
+        <div class="alert alert-danger">
+            <p>Oops, something went wrong! Please check the errors below.</p>
+        </div>
+    <% end %>
+
+    <%= label f, :original_url %>
+    <%= url_input f, :original_url, placeholder: "https://your-long-url-here.com", required: true, onblur: 'checkUrl(document.getElementById("link_original_url"))' %>
+    <%= error_tag f, :original_url %>
+    <div>
+        <%= submit "Generate short URL" %>
     </div>
-  <% end %>
-
-  <%= label f, :original_url %>
-  <%= text_input f, :original_url %>
-  <%= error_tag f, :original_url %>
-
-  <div>
-    <%= submit "Generate short URL" %>
-  </div>
-</.form>
+<% end %>
