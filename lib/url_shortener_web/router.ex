@@ -19,6 +19,7 @@ defmodule UrlShortenerWeb.Router do
 
     get "/", LinkController, :new
     resources "/links", LinkController, only: [:create, :show]
+    get "/:short_url", RedirectController, :index
   end
 
   # Other scopes may use custom stacks.

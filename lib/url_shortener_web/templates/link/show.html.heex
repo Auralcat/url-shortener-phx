@@ -2,19 +2,14 @@
 
 <ul>
   <li>
-    <strong>Original url:</strong>
+    <strong>Your long URL:</strong>
     <%= @link.original_url %>
   </li>
 
   <li>
-    <strong>Short url:</strong>
-    <%= @link.short_url %>
-  </li>
-
-  <li>
-    <strong>Hits:</strong>
-    <%= @link.hits %>
+    <strong>Short URL:</strong>
+    <%= UrlShortenerWeb.Endpoint.url() <> "/" <> @link.url_alias %>
   </li>
 </ul>
 
-<span><%= link "Back", to: Routes.link_path(@conn, :new) %></span>
+<span><%= link "Shorten another URL", to: Routes.link_path(@conn, :new) %></span>
