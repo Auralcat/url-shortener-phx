@@ -1,1 +1,85 @@
-Set up instructions go here...
+Manual setup instructions in case you don't want to use docker-compose:
+
+- Install ASDF
+- Install Docker
+- Install docker-compose
+- asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git # Add Elixir plugin to ASDF
+- asdf plugin-add erlang https://github.com/asdf-vm/asdf-erlang.git # Add Erlang plugin to ASDF
+- asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git # Add Node.js plugin to ASDF
+- Install Elixir, Erlang and Node.js versions listed in .tool-versions through ASDF with the commands:
+  + asdf install elixir
+  + asdf install erlang
+  + asdf install nodejs
+- mix local.hex --force # Install hex
+- mix local.rebar --force # Install rebar3
+- Run mix deps.get
+- cp .env.sample .env # Set up environment variables
+- Generate SECRET_KEY_BASE with phx.gen.secret and save it in env var file
+- Run mix do ecto.drop, ecto.create, ecto.migrate
+- cd into the assets directory (_not_ priv/assets!) and run npm install
+- Run mix phx.server
+
+Please note that you'll need to load the env vars manually this way.
+
+Auto setup:
+
+- Run docker-compose up from the project root
+
+This should download all required images and build the project
+containers with the required Elixir, Erlang and Node.js versions.
+
+Introduction:
+
+We're using the Link model in the database to store the relation
+between the URL provided by the user in the front-end form
+(original_url) and the generated hash (url_alias).
+
+The final short URL is the application host URL joined with the
+url_alias.
+
+The length of the URL alias can be controlled through the
+URL_ALIAS_LENGTH environment variable. The default value for it is 8.
+
+It's important to set a small number so we won't have any URL aliases
+clashing with each other. The SHA1 algorithm used to generate the hash
+also provides a big enough permutation space.
+
+Performance assumptions:
+
+We're assuming that the application will receive 5 requests per second
+to create new links. This translates into 5 * 60 * 60 * 24 = 432000
+requests per day. Assuming that each request is to create new short
+URLs, our database would have 432000 new entries in the links table
+every day if left unchecked. This would hinder the read and write
+performance of the database in a short time.
+
+To handle this scenario, there is a periodic job using the Quantum
+library to remove stale links from the database. A link is stale when
+it is not updated within the last X days. The amount of days is
+defined through the LINKS_UPDATED_AT_THRESHOLD_DAYS environment
+variable.
+
+The system also upserts new link entries in the database: if the user
+sends a URL that is already associated with a short URL alias, the
+system returns the previous record.
+
+NOTE: With an in-memory database like Redis or ETS, we could have a
+higher amount of saved links without having the performance issues we
+have in persistent data storage, since it's much faster to access data
+in memory than in the hard disk.
+
+Navigating to a short URL:
+
+When the user inputs a short URL with the host name and a recognized
+URL alias, the system will redirect the user to the saved original
+URL. The system encodes the original URL in the database before saving
+it so the user is redirected to the correct destination when saving a
+URL with non-ASCII characters or spaces in it (we can have that in
+search query URLs, for example).
+
+UX assumptions:
+
+- When the user inputs a URL like example.com, the system completes
+  the protocol part with http:// when unfocusing from the URL input.
+- We're using the HTML5 URL form field to validate URL format in the
+  frontend.
