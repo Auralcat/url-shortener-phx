@@ -12,6 +12,8 @@ defmodule UrlShortener.Application do
       UrlShortener.Repo,
       # Start the Telemetry supervisor
       UrlShortenerWeb.Telemetry,
+      # Start Quantum scheduler,
+      UrlShortener.Scheduler,
       # Start the PubSub system
       {Phoenix.PubSub, name: UrlShortener.PubSub},
       # Start the Endpoint (http/https)

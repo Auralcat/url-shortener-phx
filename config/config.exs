@@ -10,6 +10,12 @@ import Config
 config :url_shortener,
   ecto_repos: [UrlShortener.Repo]
 
+config :url_shortener, UrlShortener.Scheduler,
+  jobs: [
+    # Run at 12AM and 12PM
+    {{:cron, "0 */12 * * *"}, {UrlShortener.CleanUnusedLinks, :delete_unused_links, []}}
+  ]
+
 # Configures the endpoint
 config :url_shortener, UrlShortenerWeb.Endpoint,
   url: [host: "localhost"],

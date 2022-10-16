@@ -1,9 +1,8 @@
 defmodule UrlShortener.Links do
-  @moduledoc """
-  The Links context.
-  """
+  @moduledoc false
 
   @url_alias_length 8
+  @links_updated_at_threshold_days 7
   @hashing_algorithm :sha
 
   import Ecto.Query, warn: false
@@ -15,15 +14,6 @@ defmodule UrlShortener.Links do
   Gets a single link.
 
   Raises `Ecto.NoResultsError` if the Link does not exist.
-
-  ## Examples
-
-      iex> get_link!(123)
-      %Link{}
-
-      iex> get_link!(456)
-      ** (Ecto.NoResultsError)
-
   """
   def get_link!(id), do: Repo.get!(Link, id)
 
@@ -80,6 +70,9 @@ defmodule UrlShortener.Links do
     {:ok, url_alias}
   end
 
+  @doc """
+  Returns the URL alias associated with the provided short URL in the database.
+  """
   @spec get_link_by_short_url(String.t()) :: {:ok, Link.t()} | {:error, term()}
   def get_link_by_short_url(short_url) do
     with {:ok, url_alias} <- get_url_alias_from_short_url(short_url),
@@ -95,6 +88,11 @@ defmodule UrlShortener.Links do
     link_changeset = Ecto.Changeset.change(link, hits: link.hits + 1)
 
     Repo.update(link_changeset)
+  end
+
+  def delete_unused_links() do
+    from(l in Link, where: l.updated_at < ago(@links_updated_at_threshold_days, "day"))
+    |> Repo.delete_all()
   end
 
   defp get_url_alias_from_short_url(short_url) do

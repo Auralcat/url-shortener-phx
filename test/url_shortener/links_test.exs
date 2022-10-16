@@ -68,5 +68,18 @@ defmodule UrlShortener.LinksTest do
       assert updated_link.url_alias == link.url_alias
       assert updated_link.hits == 1
     end
+
+    test "delete_unused_links removes links that were not updated in the last 7 days" do
+      now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+      seven_days_ago = NaiveDateTime.add(now, -1 * 7 * 60 * 60 * 24, :second)
+      six_days_ago = NaiveDateTime.add(now, -1 * 6 * 60 * 60 * 24, :second)
+
+      insert!(:link, updated_at: seven_days_ago)
+      insert!(:link, updated_at: six_days_ago)
+
+      Links.delete_unused_links()
+
+      assert [%Link{updated_at: ^six_days_ago}] = Repo.all(Link)
+    end
   end
 end
