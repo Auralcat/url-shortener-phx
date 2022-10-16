@@ -22,8 +22,9 @@ ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y build-essential curl git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 # prepare build dir
 WORKDIR /app
@@ -34,6 +35,10 @@ RUN mix local.hex --force && \
 
 # set build ENV
 ENV MIX_ENV="prod"
+
+# install NPM packages
+COPY assets/package.json assets/package-lock.json ./assets/
+RUN npm install --prefix ./assets  --progress=false --no-audit --loglevel=error
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
@@ -53,7 +58,7 @@ COPY lib lib
 COPY assets assets
 
 # compile assets
-# RUN mix assets.deploy
+RUN mix assets.deploy
 
 # Compile the release
 RUN mix compile
