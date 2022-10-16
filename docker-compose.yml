@@ -20,7 +20,7 @@ services:
       - db
     environment:
       MIX_ENV: dev
-      DATABASE_URL: ecto://postgres:postgres@db/url_shortener_dev
+      DATABASE_URL: ecto://postgres:postgres@db:5432/url_shortener_dev
     env_file:
       - .env
     ports:

@@ -1,4 +1,4 @@
-import * as validUrl from "valid-url";
+import * as validUrl from 'valid-url';
 
 window.validUrl = validUrl;
 window.checkUrl = function checkUrl(urlInput) {
