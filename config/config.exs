@@ -21,7 +21,9 @@ config :url_shortener, UrlShortenerWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [view: UrlShortenerWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: UrlShortener.PubSub,
-  live_view: [signing_salt: "RqI+wTvX"]
+  live_view: [signing_salt: "RqI+wTvX"],
+  url_alias_length: {:system, :integer, "URL_ALIAS_LENGTH", 8},
+  links_updated_at_threshold_days: {:system, :integer, "LINKS_UPDATED_AT_THRESHOLD_DAYS", 7}
 
 # Configure esbuild (the version is required)
 config :esbuild,

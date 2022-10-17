@@ -20,7 +20,7 @@ defmodule UrlShortener.MixProject do
   def application do
     [
       mod: {UrlShortener.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:confex, :logger, :runtime_tools]
     ]
   end
 
@@ -47,6 +47,7 @@ defmodule UrlShortener.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:quantum, "~> 3.0"},
+      {:confex, "~> 3.5.0"},
       {:faker, "~> 0.17", only: :test},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
     ]

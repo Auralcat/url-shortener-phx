@@ -19,6 +19,7 @@ defmodule UrlShortener.LinksTest do
     end
 
     test "create_link/1 with valid data upserts a link record with a short URL and 0 hits" do
+      Application.put_env(:url_shortener, :url_alias_length, 8)
       valid_url = "https://example.com"
       url_alias = "DKrySrGg"
       insert!(:link, original_url: valid_url, url_alias: url_alias)
@@ -35,6 +36,7 @@ defmodule UrlShortener.LinksTest do
     end
 
     test "create_link/1 with invalid data returns error changeset" do
+      Application.put_env(:url_shortener, :url_alias_length, 8)
       assert {:error, %Ecto.Changeset{}} = Links.create_link(@invalid_attrs)
     end
 
@@ -44,6 +46,8 @@ defmodule UrlShortener.LinksTest do
     end
 
     test "create_url_alias/1 returns the URL alias with the hashed link" do
+      Application.put_env(:url_shortener, :url_alias_length, 8)
+
       sample_url =
         "https://www.google.com/search?q=url+shortener&oq=google+u&aqs=chrome.0.69i59j69i60l3j0j69i57.1069j0j7&sourceid=chrome&ie=UTF-8"
 
@@ -75,7 +79,8 @@ defmodule UrlShortener.LinksTest do
       assert updated_link.hits == 1
     end
 
-    test "delete_unused_links removes links that were not updated in the last 7 days" do
+    test "delete_unused_links removes links that were not updated in the last X days" do
+      Application.put_env(:url_shortener, :links_updated_at_threshold_days, 7)
       now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
       seven_days_ago = NaiveDateTime.add(now, -1 * 7 * 60 * 60 * 24, :second)
       six_days_ago = NaiveDateTime.add(now, -1 * 6 * 60 * 60 * 24, :second)

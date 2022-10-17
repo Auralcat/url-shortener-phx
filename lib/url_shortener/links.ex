@@ -1,8 +1,6 @@
 defmodule UrlShortener.Links do
   @moduledoc false
 
-  @url_alias_length 8
-  @links_updated_at_threshold_days 7
   @hashing_algorithm :sha
 
   import Ecto.Query, warn: false
@@ -69,7 +67,7 @@ defmodule UrlShortener.Links do
       @hashing_algorithm
       |> :crypto.hash(processed_url)
       |> Base.encode64()
-      |> String.slice(0, @url_alias_length)
+      |> String.slice(0, url_alias_length())
 
     {:ok, url_alias}
   end
@@ -95,7 +93,9 @@ defmodule UrlShortener.Links do
   end
 
   def delete_unused_links() do
-    from(l in Link, where: l.updated_at < ago(@links_updated_at_threshold_days, "day"))
+    threshold_days = links_updated_at_threshold_days()
+
+    from(l in Link, where: l.updated_at < ago(^threshold_days, "day"))
     |> Repo.delete_all()
   end
 
@@ -120,5 +120,13 @@ defmodule UrlShortener.Links do
     else
       {:ok, link}
     end
+  end
+
+  defp links_updated_at_threshold_days() do
+    Confex.fetch_env!(:url_shortener, :links_updated_at_threshold_days)
+  end
+
+  defp url_alias_length() do
+    Confex.fetch_env!(:url_shortener, :url_alias_length)
   end
 end
