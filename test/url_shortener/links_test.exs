@@ -11,14 +11,18 @@ defmodule UrlShortener.LinksTest do
 
     @invalid_attrs %{original_url: "httpx://whatever"}
 
+    Application.put_env(:url_shortener, :url_alias_length, 8)
+
     test "get_link!/1 returns the link with given id" do
       link = link_fixture()
       assert Links.get_link!(link.id) == link
     end
 
-    test "create_link/1 with valid data creates a link record with a short URL and 0 hits" do
+    test "create_link/1 with valid data upserts a link record with a short URL and 0 hits" do
       valid_url = "https://example.com"
       url_alias = "DKrySrGg"
+      insert!(:link, original_url: valid_url, url_alias: url_alias)
+
       valid_attrs = %{original_url: valid_url}
 
       assert {:ok, %Link{} = link} = Links.create_link(valid_attrs)
@@ -26,6 +30,8 @@ defmodule UrlShortener.LinksTest do
       assert link.original_url == valid_url
       assert link.url_alias == url_alias
       assert link.hits == 0
+
+      assert [%Link{original_url: ^valid_url, url_alias: ^url_alias}] = Repo.all(Link)
     end
 
     test "create_link/1 with invalid data returns error changeset" do

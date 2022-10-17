@@ -6,9 +6,9 @@ defmodule UrlShortener.Links do
   @hashing_algorithm :sha
 
   import Ecto.Query, warn: false
-  alias UrlShortener.Repo
 
   alias UrlShortener.Links.Link
+  alias UrlShortener.Repo
 
   @doc """
   Gets a single link.
@@ -37,7 +37,11 @@ defmodule UrlShortener.Links do
 
       %Link{}
       |> Link.create_changeset(link_params)
-      |> Repo.insert()
+      |> Repo.insert(
+        on_conflict: :nothing,
+        conflict_target: :url_alias,
+        returning: true
+      )
     end
   end
 

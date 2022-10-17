@@ -6,7 +6,10 @@ defmodule UrlShortener.Factory do
   # Factories
 
   def build(:link) do
-    %UrlShortener.Links.Link{original_url: Faker.Internet.url(), url_alias: "DKrySrGg"}
+    %UrlShortener.Links.Link{
+      original_url: Faker.Internet.url(),
+      url_alias: Faker.String.base64(8)
+    }
   end
 
   # Convenience API

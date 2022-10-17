@@ -23,6 +23,7 @@ defmodule UrlShortener.Links.Link do
     |> validate_required(@required_fields)
     |> validate_url_format(@original_url_field)
     |> put_encoded_url()
+    |> unique_constraint(:url_alias)
   end
 
   def update_changeset(link, attrs) do
